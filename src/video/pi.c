@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Video decode on Raspberry Pi using OpenMAX IL though the ilcient helper library
 // Based upon video decode example from the Raspberry Pi firmware
-
+#include "../config.h"
 #include <Limelight.h>
 
 #include <sps.h>
@@ -186,20 +186,30 @@ static void decoder_renderer_cleanup() {
   if(OMX_EmptyThisBuffer(ILC_GET_HANDLE(list[0]), buf) != OMX_ErrorNone){
     fprintf(stderr, "Can't empty video buffer\n");
     return;
+  } 
+
+  if(!config->forceomxcleanup)  {
+   
+   //we might have to skip these calls to avoid a bug where the
+   //moonlight client might ocasionally not disconnect properly 
+   //and leave both the host and the remove server in an undefined state.
+   //in this state the raspberry does not react to mouse or keyboard press events
+   //but the OS is still running. Moonlight can be killed via ssh using kill -9 (pid)
+   //note that upgrading firwmare to the lastest debian kernel (4.19.79 at this time)
+   //does not fix the issue.
+   // need to flush the renderer to allow video_decode to disable its input port          
+    ilclient_flush_tunnels(tunnel, 0);
+   
+    ilclient_disable_port_buffers(list[0], 130, NULL, NULL, NULL);
+
+    ilclient_disable_tunnel(tunnel);
+    ilclient_teardown_tunnels(tunnel);
+
+    ilclient_state_transition(list, OMX_StateIdle);
+    ilclient_state_transition(list, OMX_StateLoaded);
+
+    ilclient_cleanup_components(list);
   }
-
-  // need to flush the renderer to allow video_decode to disable its input port
-  ilclient_flush_tunnels(tunnel, 0);
-
-  ilclient_disable_port_buffers(list[0], 130, NULL, NULL, NULL);
-
-  ilclient_disable_tunnel(tunnel);
-  ilclient_teardown_tunnels(tunnel);
-
-  ilclient_state_transition(list, OMX_StateIdle);
-  ilclient_state_transition(list, OMX_StateLoaded);
-
-  ilclient_cleanup_components(list);
 
   OMX_Deinit();
 

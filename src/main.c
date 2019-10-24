@@ -196,6 +196,7 @@ static void help() {
   printf("\n I/O options (Not for SDL)\n\n");
   printf("\t-input <device>\t\tUse <device> as input. Can be used multiple times\n");
   printf("\t-audio <device>\t\tUse <device> as audio output device\n");
+  printf("\t-forceomxcleanup\t\tForce OMX decoder cleanup on quit(fix ocasional hangs on disconnect) \n");
   #endif
   printf("\nUse Ctrl+Alt+Shift+Q or Play+Back+LeftShoulder+RightShoulder to exit streaming session\n\n");
   exit(0);

@@ -42,6 +42,7 @@ typedef struct _CONFIGURATION {
   bool unsupported;
   bool quitappafter;
   bool viewonly;
+  bool forceomxcleanup;
   char* inputs[MAX_INPUTS];
   int inputsCount;
   enum codecs codec;

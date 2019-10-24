@@ -67,6 +67,7 @@ static struct option long_options[] = {
   {"unsupported", no_argument, NULL, 'y'},
   {"quitappafter", no_argument, NULL, '1'},
   {"viewonly", no_argument, NULL, '2'},
+  {"forceomxcleanup", no_argument, NULL, '3'},
   {"verbose", no_argument, NULL, 'z'},
   {"debug", no_argument, NULL, 'Z'},
   {0, 0, 0, 0},
@@ -220,6 +221,8 @@ static void parse_argument(int c, char* value, PCONFIGURATION config) {
   case '2':
     config->viewonly = true;
     break;
+  case '3':
+    config->forceomxcleanup  = true;
   case 'z':
     config->debug_level = 1;
     break;
