@@ -116,6 +116,11 @@ static void stream(PSERVER_DATA server, PCONFIGURATION config, enum platform sys
   if (config->fullscreen)
     drFlags |= DISPLAY_FULLSCREEN;
 
+  if (config->forceomxcleanup) {
+    drFlags |= FORCE_OMX_CLEANUP;
+    fprintf(stderr, "Enabled OMX cleanup\n");
+   }
+
   if (config->debug_level > 0) {
     printf("Stream %d x %d, %d fps, %d kbps\n", config->stream.width, config->stream.height, config->stream.fps, config->stream.bitrate);
     connection_debug = true;
@@ -131,7 +136,7 @@ static void stream(PSERVER_DATA server, PCONFIGURATION config, enum platform sys
     if (!config->viewonly)
       evdev_start();
     loop_main();
-    if (!config->viewonly)
+     if (!config->viewonly)
       evdev_stop();
   }
   #ifdef HAVE_SDL

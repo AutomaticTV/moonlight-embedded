@@ -28,6 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Video decode on Raspberry Pi using OpenMAX IL though the ilcient helper library
 // Based upon video decode example from the Raspberry Pi firmware
 #include "../config.h"
+#include "video.h"
 #include <Limelight.h>
 
 #include <sps.h>
@@ -49,7 +50,7 @@ static COMPONENT_T *video_decode = NULL, *video_scheduler = NULL, *video_render 
 
 static int port_settings_changed;
 static int first_packet;
-
+static bool force_omx_cleanup = false;
 static int decoder_renderer_setup(int videoFormat, int width, int height, int redrawRate, void* context, int drFlags) {
   if (videoFormat != VIDEO_FORMAT_H264) {
     fprintf(stderr, "Video format not supported\n");
@@ -58,7 +59,8 @@ static int decoder_renderer_setup(int videoFormat, int width, int height, int re
 
   bcm_host_init();
   gs_sps_init(width, height);
-
+  
+  force_omx_cleanup = drFlags | FORCE_OMX_CLEANUP;
   OMX_VIDEO_PARAM_PORTFORMATTYPE format;
   OMX_TIME_CONFIG_CLOCKSTATETYPE cstate;
   COMPONENT_T *clock = NULL;
@@ -188,8 +190,8 @@ static void decoder_renderer_cleanup() {
     return;
   } 
 
-  if(!config->forceomxcleanup)  {
-   
+  if(!force_omx_cleanup)  {
+       fprintf(stderr, "disabled OMX cleanup\n");
    //we might have to skip these calls to avoid a bug where the
    //moonlight client might ocasionally not disconnect properly 
    //and leave both the host and the remove server in an undefined state.

@@ -223,6 +223,7 @@ static void parse_argument(int c, char* value, PCONFIGURATION config) {
     break;
   case '3':
     config->forceomxcleanup  = true;
+    break;
   case 'z':
     config->debug_level = 1;
     break;
@@ -296,6 +297,8 @@ void config_save(char* filename, PCONFIGURATION config) {
     write_config_bool(fd, "localaudio", config->localaudio);
   if (config->quitappafter)
     write_config_bool(fd, "quitappafter", config->quitappafter);
+  if (config->forceomxcleanup)
+    write_config_bool(fd, "forceomxcleanup", config->forceomxcleanup);
   if (config->viewonly)
     write_config_bool(fd, "viewonly", config->viewonly);
 
@@ -331,7 +334,7 @@ void config_parse(int argc, char* argv[], PCONFIGURATION config) {
   config->quitappafter = false;
   config->viewonly = false;
   config->codec = CODEC_UNSPECIFIED;
-
+  config->forceomxcleanup = false;
   config->inputsCount = 0;
   config->mapping = get_path("gamecontrollerdb.txt", getenv("XDG_DATA_DIRS"));
   config->key_dir[0] = 0;
